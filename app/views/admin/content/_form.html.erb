@@ -147,7 +147,16 @@
       <%= render 'admin/content/attachment', { :attachment_num => 1, :hidden => false } -%>
     </ul>
   </div>    
-  </div>
 
+  <% if current_user.admin? %>
+    <div class=''>
+      <h3><%= _("Merge Articles") %></h3>
+      <%= form_tag do %>
+        <%= label_tag(:merge_with, "Article ID") %>
+        <%= text_field_tag(:merge_with) %>
+        <%= submit_tag("Merge") %>
+      <% end %>
+    </div>
+  <% end %>
 </div>
 

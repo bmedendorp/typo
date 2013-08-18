@@ -24,8 +24,9 @@ module NavigationHelpers
     #   when /^(.*)'s profile page$/i
     #     user_profile_path(User.find_by_login($1))
 
-    when /^the edit page for article (\d*)$/
-      "/admin/content/edit/#{$1}"
+    when /^the edit page for article "([^"]*)"$/
+      article = Content.where(:title => $1).first
+      "/admin/content/edit/#{article.id}"
 
     else
       begin

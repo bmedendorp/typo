@@ -19,9 +19,8 @@ end
 Given /^the following articles exist:$/ do |articles_table|
 	articles_table.hashes.each do |art|
 		user = User.where(:login => art['user']).first
-		article = Article.new({:type => 'Article', :title => art['title'], :body => art['body'], :user_id => user.id})
+		article = Article.new({:title => art['title'], :body => art['body'], :user_id => user.id})
 		article.publish!
-		article.save
 	end
 end
 
