@@ -607,6 +607,14 @@ describe Admin::ContentController do
       end
     end
 
+    describe 'merge action' do
+
+      it 'should call the model method that performs the merge' do
+        Article.should_receive(:merge_with!).with(@article.id, 807).and_return(@article)
+        post :new, {:id => @article.id, :article => {:body => "body message"}, :merge_with => 807, :commit => "Merge"}
+      end
+    end
+
   end
 
   describe 'with publisher connection' do

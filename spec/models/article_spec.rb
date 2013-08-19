@@ -630,5 +630,46 @@ describe Article do
     end
 
   end
+
+  describe "merge_with" do
+    before do
+      @article1 = Factory.create(:article, :body => "Article 1 message body")
+      @article2 = Factory.create(:article, :body => "Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum")
+      @article3 = Factory.create(:article)
+      Factory.create(:comment, :article_id => @article1.id)
+      Factory.create(:comment, :article_id => @article1.id)
+      Factory.create(:comment, :article_id => @article2.id)
+      Factory.create(:comment, :article_id => @article2.id)
+      Factory.create(:comment, :article_id => @article2.id)
+      Factory.create(:comment, :article_id => @article3.id)
+      Factory.create(:comment, :article_id => @article3.id)
+      Factory.create(:comment, :article_id => @article3.id)
+      @merged_article = Article.merge_with!(@article1.id, @article2.id)
+    end
+
+    it "should merge article texts" do
+      @merged_article.body.include?(@article1.body).should == true
+      @merged_article.body.include?(@article2.body).should == true
+    end
+    it "should retain the author of one article" do
+      author = @merged_article.author
+      author.should == @article1.author || author.should == @article2.author
+    end
+    it "should retain the title of one article" do
+      title = @merged_article.title
+      title.should == @article1.title || title.should == @article2.title
+    end
+    it "should point all comments to the new article" do
+      @merged_article.comments.count.should == 5
+    end
+    it "should remove the 2nd article, leaving only the 1st" do
+      expect {Article.find(@article2.id)}.to raise_error
+      Article.find(@article1.id).id.should == @merged_article.id
+    end
+    it "should return nil if either ID does not exist in database" do
+      Article.merge_with!(@article3, @article2).should be nil
+      Article.merge_with!(@article2, @article3).should be nil
+    end
+  end
 end
 

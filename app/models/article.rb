@@ -416,6 +416,26 @@ class Article < Content
     user.admin? || user_id == user.id
   end
 
+  def self.merge_with!(id1, id2)
+    article1 = Article.where(:id => id1).first
+    article2 = Article.where(:id => id2).first
+    if !article1 || !article2
+      return nil
+    end
+    article1.body += article2.body
+
+    # Point all comments from article 2 to the new, merged article
+    article2.comments.each do |comment|
+      comment.article_id = article1.id
+      comment.save
+    end
+
+    # Reload article2 prior to destroying to avoid catching issues with comments
+    article2 = Article.find(article2.id)
+    article2.destroy
+    return article1
+  end
+
   protected
 
   def set_published_at
