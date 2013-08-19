@@ -15,11 +15,16 @@ Feature: Merge Authors
     | Life as Admin | I am the admin...I am god      | admin    |
 
   Scenario: Admin can merge articles
-    And I am logged into the admin panel as admin(aaaaaaaa)
+    When I am logged into the admin panel as admin(aaaaaaaa)
     And I am on the edit page for article "Life as Admin"
     Then I should see "Merge Articles"
 
   Scenario: Non-admin cannot merge articles
-    And I am logged into the admin panel as someuser(password)
+    When I am logged into the admin panel as someuser(password)
     And I am on the edit page for article "My Title"
+    Then I should not see "Merge Articles"
+
+  Scenario: Should not be able to merge articles from 'new article' page
+    When I am logged into the admin panel as admin(aaaaaaaa)
+    And I am on the new article page
     Then I should not see "Merge Articles"
