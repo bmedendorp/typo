@@ -145,15 +145,6 @@ class Admin::ContentController < Admin::BaseController
     @article = Article.get_or_build_article(id)
     @article.text_filter = current_user.text_filter if current_user.simple_editor?
 
-    if params[:commit] == "Merge"
-      merged_article = Article.merge_with!(@article.id, params[:merge_with])
-      if !merged_article
-        flash[:warning] = "Merge Unsuccessful: Articles for merge could not be found"
-      else
-        @article = merged_article
-      end
-    end
-
     @post_types = PostType.find(:all)
     if request.post?
       if params[:article][:draft]
@@ -170,6 +161,15 @@ class Admin::ContentController < Admin::BaseController
     # TODO: Consider refactoring, because double rescue looks... weird.
         
     @article.published_at = DateTime.strptime(params[:article][:published_at], "%B %e, %Y %I:%M %p GMT%z").utc rescue Time.parse(params[:article][:published_at]).utc rescue nil
+
+    if params[:commit] == "Merge"
+      merged_article = Article.merge_with!(@article.id, params[:merge_with])
+      if !merged_article
+        flash[:warning] = "Merge Unsuccessful: Articles for merge could not be found"
+      else
+        @article = merged_article
+      end
+    end
 
     if request.post?
       set_article_author
