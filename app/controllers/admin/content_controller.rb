@@ -162,7 +162,7 @@ class Admin::ContentController < Admin::BaseController
         
     @article.published_at = DateTime.strptime(params[:article][:published_at], "%B %e, %Y %I:%M %p GMT%z").utc rescue Time.parse(params[:article][:published_at]).utc rescue nil
 
-    if params[:merge_with] != nil && !params[:merge_with].empty?
+    if current_user.admin? && params[:merge_with] != nil && !params[:merge_with].empty?
       merged_article = Article.merge_with!(@article.id, params[:merge_with])
       if !merged_article
         flash[:warning] = "Merge Unsuccessful: Articles for merge could not be found"
